@@ -1,0 +1,11 @@
+{
+  "name": "hds-confs",
+  "version": "1.0.0",
+  "description": "hds's config",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "js.zhang",
+  "license": "ISC"
+}

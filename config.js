@@ -117,12 +117,14 @@ module.exports = function(context){
         },
 
         plugins: [
-            new webpack.DefinePlugin({
-                'process.env': process.env.NODE_ENV
-            }),
             ...(
                 isProduction ? 
                     [
+                        new webpack.DefinePlugin({
+                            'process.env': {
+                                NODE_ENV: '"' + process.env.NODE_ENV + '"'
+                            }
+                        }),
                         new UglifyJsPlugin(),
                         new OptimizeCSSPlugin({
                             cssProcessorOptions: { 

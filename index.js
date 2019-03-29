@@ -14,12 +14,6 @@ function getUserDefineConfig(CWD, commonConfigs){
     if(/^\w+$/.test(env)){
         var file = path.join(CWD, 'conf/env', env + '.js');
 
-        if(/testing|production/.test(env)){
-            process.env.NODE_ENV = env;
-        }else{
-            process.env.NODE_ENV = 'development';
-        }
-
         try{
             config = require(file);
         }catch(e){}

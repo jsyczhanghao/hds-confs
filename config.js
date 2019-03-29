@@ -87,7 +87,7 @@ module.exports = function(context){
                 {
                     test: /\.js$/,
                     loader: 'babel-loader',
-                    include: [resolve('static'), resolve('node_modules/webpack-dev-server/client')]
+                    include: [resolve('src'), resolve('node_modules/webpack-dev-server/client')]
                 },
                 {
                     test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

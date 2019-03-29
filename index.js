@@ -14,6 +14,12 @@ function getUserDefineConfig(CWD, commonConfigs){
     if(/^\w+$/.test(env)){
         var file = path.join(CWD, 'conf/env', env + '.js');
 
+        if(/testing|production/.test(env)){
+            process.env.NODE_ENV = env;
+        }else{
+            process.env.NODE_ENV = 'development';
+        }
+
         try{
             config = require(file);
         }catch(e){}
@@ -31,7 +37,6 @@ function getUserDefineConfig(CWD, commonConfigs){
 
 exports.init = function(CWD, commonConfigs = {}){ 
     var userDefineConfigs = getUserDefineConfig(CWD, commonConfigs);
-
     var configs = require('./config')(CWD);
     var files = glob.sync(path.join(CWD, '*.html'));
     var entrys = configs.entry;
@@ -71,6 +76,37 @@ exports.init = function(CWD, commonConfigs = {}){
             return configs;
         });
     }else{
-        webpack(configs);
+        const ora = require('ora');
+        const chalk = require('chalk');
+        const rm = require('rimraf');
+        const spinner = ora('building for production...');
+
+        spinner.start();
+
+        rm(configs.output.path, err => {
+            if (err) throw err;
+            webpack(configs, (err, stats) => {
+                spinner.stop();
+                if (err) throw err;
+                process.stdout.write(stats.toString({
+                    colors: true,
+                    modules: false,
+                    children: false,
+                    chunks: false,
+                    chunkModules: false
+                }) + '\n\n')
+
+                if (stats.hasErrors()) {
+                    console.log(chalk.red('  Build failed with errors.\n'));
+                    process.exit(1);
+                }
+
+                console.log(chalk.cyan('  Build complete.\n'));
+                console.log(chalk.yellow(
+                '  Tip: built files are meant to be served over an HTTP server.\n' +
+                '  Opening index.html over file:// won\'t work.\n'
+                ));
+            });
+        });
     }
 };

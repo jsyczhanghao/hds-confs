@@ -7,37 +7,56 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const apiMocker = require('webpack-api-mocker');
 
-module.exports = function(context){
+module.exports = function(context, basePath = ''){
     function resolve(dir){
-        return path.join(context, dir);
-    }
+        return path.join(context, dir || '');
+    }   
 
     return {
         devServer: {
-          historyApiFallback: {
-            rewrites: [
-              { from: /.*/, to: '/index.html' },
-            ],
-          },
-          hot: true,
-          compress: true,
-          open: true,
-          overlay: true,
-          publicPath: '/',
-          proxy: {},
-          quiet: true,
-          watchOptions: {
+            historyApiFallback: {
+                rewrites: [
+                    { from: /.*/, to: '/index.html' },
+                ]
+            },
+            hot: true,
+            compress: true,
+            open: true,
+            overlay: true,
+            publicPath: '/',
+            before: function(app){
+                apiMocker(app, path.resolve(context, 'conf/mocker.js'), {
+                    proxy: require(resolve('conf/proxy.js')),
+                    changeHost: true
+                });
+            },
+            proxy: {
+
+            },
+            quiet: true,
+            watchOptions: {
             poll: true
-          }
+            }
         },
 
         devtool: isProduction ? '#source-map' : 'cheap-module-eval-source-map',
         context: context,
         output: {
-            path: isProduction ? resolve('output') : resolve('_debug'),
-            filename: '[name].[hash].js',
-            publicPath: '/'
+            path: isProduction ? resolve('dist') : resolve('_debug'),
+            publicPath: '',
+            ...(isProduction ? 
+                {
+                    filename: basePath + 'js/[name].[chunkhash].js',
+                    chunkFilename: basePath + 'js/[id].[chunkhash].js'
+                }
+                : 
+                {
+                    filename: basePath + 'js/[name].[hash].js'
+                }
+            )
         },
         entry: {},
         resolve: {
@@ -94,7 +113,7 @@ module.exports = function(context){
                     loader: 'url-loader',
                     options: {
                         limit: 100,
-                        name: 'img/[name].[hash:7].[ext]'
+                        name: basePath + 'img/[name].[hash:7].[ext]'
                     }
                 },
                 {
@@ -102,7 +121,7 @@ module.exports = function(context){
                     loader: 'url-loader',
                     options: {
                         limit: 10000,
-                        name: 'media/[name].[hash:7].[ext]'
+                        name: basePath + 'media/[name].[hash:7].[ext]'
                     }
                 },
                 {
@@ -110,7 +129,7 @@ module.exports = function(context){
                     loader: 'url-loader',
                     options: {
                         limit: 10000,
-                        name: 'fonts/[name].[hash:7].[ext]'
+                        name: basePath + 'fonts/[name].[hash:7].[ext]'
                     }
                 }
             ]
@@ -124,6 +143,10 @@ module.exports = function(context){
                             'process.env': {
                                 NODE_ENV: '"' + process.env.NODE_ENV + '"'
                             }
+                        }),
+                        new ExtractTextPlugin({
+                            filename: basePath + 'css/[name].[contenthash].css',
+                            allChunks: true
                         }),
                         new UglifyJsPlugin(),
                         new OptimizeCSSPlugin({
@@ -141,13 +164,22 @@ module.exports = function(context){
             new webpack.optimize.ModuleConcatenationPlugin(),
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'vendor',
-                filename: '[name].js',
-                minChunks: function (module,count) {
+                minChunks: function(module,count){
                 return (
                     module.resource &&
                     /\.js$/.test(module.resource) &&
                     module.resource.indexOf(path.join(context, './node_modules')) === 0
                 )
+                }
+            }),
+            new webpack.optimize.CommonsChunkPlugin({
+                name: 'v~',
+                minChunks: function(module,count){
+                    return (
+                        module.resource &&
+                        /vue|vuex|vue-/.test(module.resource) &&
+                        module.resource.indexOf(path.join(context, './node_modules')) === 0
+                    )
                 }
             }),
             // extract webpack runtime and module manifest to its own file in order to
@@ -160,10 +192,11 @@ module.exports = function(context){
             // in a separate chunk, similar to the vendor chunk
             // see: https://webpack.js.org/plugins/commons-chunk-plugin/#extra-async-commons-chunk
             new webpack.optimize.CommonsChunkPlugin({
+                name: 'app',
                 async: 'children-async',
                 children: true,
                 minChunks: 2
-            })
+            }) 
         ]
     };
 };

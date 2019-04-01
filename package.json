@@ -1,30 +1,4 @@
 {
-  "_from": "github:jsyczhanghao/hds-confs",
-  "_id": "hds-confs@1.0.0",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/hds-confs",
-  "_phantomChildren": {
-    "lru-cache": "4.1.5",
-    "shebang-command": "1.2.0",
-    "which": "1.3.1"
-  },
-  "_requested": {
-    "type": "git",
-    "raw": "hds-confs@github:jsyczhanghao/hds-confs",
-    "name": "hds-confs",
-    "escapedName": "hds-confs",
-    "rawSpec": "github:jsyczhanghao/hds-confs",
-    "saveSpec": "github:jsyczhanghao/hds-confs",
-    "fetchSpec": null,
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "#DEV:/"
-  ],
-  "_resolved": "github:jsyczhanghao/hds-confs#32f860880efa7634e6c52e18c3bdcadfda9c4d61",
-  "_spec": "hds-confs@github:jsyczhanghao/hds-confs",
-  "_where": "D:\\code\\hfds1",
   "author": {
     "name": "js.zhang"
   },
@@ -67,6 +41,7 @@
     "jest-serializer-vue": "^0.3.0",
     "nightwatch": "^0.9.12",
     "node-notifier": "^5.1.2",
+    "node-ssh": "^5.1.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^1.2.0",
     "portfinder": "^1.0.20",
@@ -85,6 +60,7 @@
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.5.2",
     "webpack": "^3.6.0",
+    "webpack-api-mocker": "^1.6.6",
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-merge": "^4.2.1"
   },

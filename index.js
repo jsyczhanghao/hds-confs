@@ -12,12 +12,14 @@ function getUserDefineConfig(CWD, commonConfigs){
     var env = argvs[argvs.length - 1];
 
     if(/^\w+$/.test(env)){
-        var file = path.join(CWD, 'conf/env', env + '.js');
-
-        try{
-            config = require(file);
-        }catch(e){}
+        process.env.NODE_ENV = env;
     }
+    
+    var file = path.join(CWD, 'conf/env', process.env.NODE_ENV + '.js');
+    
+    try{
+        config = require(file);
+    }catch(e){}
 
     var useServer = /webpack-dev-server/.test(process.argv[1]);
 
@@ -25,13 +27,33 @@ function getUserDefineConfig(CWD, commonConfigs){
 
     return {
         server: useServer,
-        config: merge(config, commonConfigs)
+        config: merge(commonConfigs, config)
     };
 }
 
 exports.init = function(CWD, commonConfigs = {}){ 
     var userDefineConfigs = getUserDefineConfig(CWD, commonConfigs);
-    var configs = require('./config')(CWD);
+
+    var publicPath = '/static', basePath = 'static';
+    
+    try{
+        publicPath = userDefineConfigs.config.output.publicPath;
+    }catch(e){};
+
+    publicPath.replace(/((?:(?:https?:)?\/\/\w+(?:\.\w+)+)?\/?)?(.*)/, function(all, domain, base){
+        publicPath = domain || '';
+        basePath = base;
+    });
+
+    if(basePath){
+        basePath = basePath.replace(/\/$/, '') + '/';
+    }
+
+    var configs = merge(require('./config')(CWD, basePath), userDefineConfigs.config, {
+        output: {
+            publicPath: publicPath
+        }
+    });
     var files = glob.sync(path.join(CWD, '*.html'));
     var entrys = configs.entry;
 
@@ -51,18 +73,10 @@ exports.init = function(CWD, commonConfigs = {}){
             configs.plugins.push(new HtmlWebpackPlugin({
                 template: file,
                 filename: subpath,
-                chunks: entry ? ['manifest', 'vendor', entry] : []
+                chunks: entry ? ['manifest', 'v~', 'vendor', 'app', entry] : []
             }))
         }
     });
-
-    //copy
-    configs.plugins.push(
-        new ExtractTextPlugin({
-            filename: '[name].[contenthash].css',
-            allChunks: true
-        })
-    );
 
     if(userDefineConfigs.server){
         return require('./port').then((port) => {

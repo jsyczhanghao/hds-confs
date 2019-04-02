@@ -36,8 +36,6 @@ module.exports = function(context, basePath = '', nomocker = false){
         };
     }
 
-    console.log(p)
-
     return {
         devServer: {
             historyApiFallback: {

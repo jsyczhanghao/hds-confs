@@ -10,10 +10,33 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const apiMocker = require('webpack-api-mocker');
 
-module.exports = function(context, basePath = ''){
+module.exports = function(context, basePath = '', nomocker = false){
     function resolve(dir){
         return path.join(context, dir || '');
     }   
+
+    var p;
+
+    if(nomocker){
+        p = {proxy: require(resolve('conf/proxy.js'))};
+    }else{
+        var proxy = require(resolve('conf/proxy.js'));
+        
+        for(let id in proxy){
+            proxy[id] = proxy[id].target;
+        }
+
+        p = {
+            before: function(app){
+                apiMocker(app, path.resolve(context, 'conf/mocker.js'), {
+                    proxy: proxy,
+                    changeHost: true
+                });
+            }
+        };
+    }
+
+    console.log(p)
 
     return {
         devServer: {
@@ -27,18 +50,10 @@ module.exports = function(context, basePath = ''){
             open: true,
             overlay: true,
             publicPath: '/',
-            before: function(app){
-                apiMocker(app, path.resolve(context, 'conf/mocker.js'), {
-                    proxy: require(resolve('conf/proxy.js')),
-                    changeHost: true
-                });
-            },
-            proxy: {
-
-            },
+            ...p,
             quiet: true,
-            watchOptions: {
-            poll: true
+            watchOptions: { 
+                poll: true
             }
         },
 

@@ -1,3 +1,4 @@
+
 var path = require('path');
 var fs = require('fs');
 var glob = require('glob');
@@ -6,38 +7,24 @@ var webpack = require('webpack');
 var merge = require('webpack-merge');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-function getUserDefineConfig(CWD, commonConfigs){
-    var argvs = process.argv;
-    var config = {};
-    var env = argvs[argvs.length - 1];
+module.exports = (function(){
+    var CWD = process.cwd();
+    var extraConfigs = {};
 
-    if(/^\w+$/.test(env)){
-        process.env.NODE_ENV = env;
-    }
-    
-    var file = path.join(CWD, 'conf/env', process.env.NODE_ENV + '.js');
-    
     try{
-        config = require(file);
-    }catch(e){}
+        extraConfigs = require(process.extra_config);
+    }catch(e){};
 
-    var useServer = /webpack-dev-server/.test(process.argv[1]);
+    var commonConfigs = require(path.join(CWD, 'conf/conf.js'));
+    var nomocker = commonConfigs.nomocker || extraConfigs.nomocker;
+    delete commonConfigs.nomocker;
+    delete extraConfigs.nomocker;
 
-    config.watch = useServer;
-
-    return {
-        server: useServer,
-        config: merge(commonConfigs, config)
-    };
-}
-
-exports.init = function(CWD, commonConfigs = {}){ 
-    var userDefineConfigs = getUserDefineConfig(CWD, commonConfigs);
-
+    var userDefineConfigs = merge(commonConfigs, extraConfigs);
     var publicPath = '/static', basePath = 'static';
     
     try{
-        publicPath = userDefineConfigs.config.output.publicPath;
+        publicPath = userDefineConfigs.output.publicPath;
     }catch(e){};
 
     publicPath.replace(/((?:(?:https?:)?\/\/\w+(?:\.\w+)+)?\/?)?(.*)/, function(all, domain, base){
@@ -49,11 +36,12 @@ exports.init = function(CWD, commonConfigs = {}){
         basePath = basePath.replace(/\/$/, '') + '/';
     }
 
-    var configs = merge(require('./config')(CWD, basePath), userDefineConfigs.config, {
+    var configs = merge(require('./config')(CWD, basePath, nomocker), userDefineConfigs.config, {
         output: {
             publicPath: publicPath
         }
     });
+
     var files = glob.sync(path.join(CWD, '*.html'));
     var entrys = configs.entry;
 
@@ -78,7 +66,7 @@ exports.init = function(CWD, commonConfigs = {}){
         }
     });
 
-    if(userDefineConfigs.server){
+    if(process.env.NODE_ENV == 'dev'){
         return require('./port').then((port) => {
             configs.devServer.port = port;
             return configs;
@@ -117,4 +105,4 @@ exports.init = function(CWD, commonConfigs = {}){
             });
         });
     }
-};
+})();

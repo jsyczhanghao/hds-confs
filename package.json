@@ -64,6 +64,9 @@
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-merge": "^4.2.1"
   },
+  "bin": {
+    "hds": "bin/index.js"
+  },
   "deprecated": false,
   "description": "hds's config",
   "license": "ISC",

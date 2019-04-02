@@ -36,7 +36,7 @@ module.exports = (function(){
         basePath = basePath.replace(/\/$/, '') + '/';
     }
 
-    var configs = merge(require('./config')(CWD, basePath, nomocker), userDefineConfigs.config, {
+    var configs = merge(require('./config')(CWD, basePath, nomocker), userDefineConfigs, {
         output: {
             publicPath: publicPath
         }

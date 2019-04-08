@@ -95,7 +95,7 @@ module.exports = function(context, basePath = '', nomocker = false){
                 },
                 ...utils.styleLoaders({
                     sourceMap: true,
-                    extract: true,
+                    extract: isProduction,
                     usePostCSS: true
                 }),
                 {
@@ -149,6 +149,7 @@ module.exports = function(context, basePath = '', nomocker = false){
         },
 
         plugins: [
+            // Ignore all locale files of moment.js
             ...(
                 isProduction ? 
                     [

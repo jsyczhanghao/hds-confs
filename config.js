@@ -81,6 +81,11 @@ module.exports = function(context, basePath = '', nomocker = false){
                 '@': resolve('src')
             }
         },
+        resolveLoader: {
+            modules: [ 
+                'node_modules', path.resolve(__dirname, 'node_modules') 
+            ]
+        },
         module: {
             rules: [
                 {

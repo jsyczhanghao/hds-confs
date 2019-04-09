@@ -75,9 +75,9 @@ module.exports = function(context, basePath = '', nomocker = false){
         resolve: {
             extensions: ['.js', '.vue', '.json'],
             alias: {
-                'vue$': 'vue/dist/vue.esm.js',
-                'vuex$': 'vuex/dist/vuex.esm.js',
-                'vue-router$': 'vue-router/dist/vue-router.esm',
+                'vue$': 'vue/dist/vue.js',
+                'vuex$': 'vuex/dist/vuex.js',
+                'vue-router$': 'vue-router/dist/vue-router.js',
                 '@': resolve('src')
             }
         },
@@ -150,6 +150,7 @@ module.exports = function(context, basePath = '', nomocker = false){
 
         plugins: [
             // Ignore all locale files of moment.js
+            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),
             ...(
                 isProduction ? 
                     [
@@ -191,7 +192,7 @@ module.exports = function(context, basePath = '', nomocker = false){
                 minChunks: function(module,count){
                     return (
                         module.resource &&
-                        /vue|vuex|vue-/.test(module.resource) &&
+                        /vue\.js|vuex|vue-/.test(module.resource) &&
                         module.resource.indexOf(path.join(context, './node_modules')) === 0
                     )
                 }

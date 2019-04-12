@@ -177,46 +177,50 @@ module.exports = function(context, basePath = '', nomocker = false){
                                 } 
                             }
                         }),
-                        new webpack.HashedModuleIdsPlugin()
+                        new webpack.HashedModuleIdsPlugin(),
+                        new webpack.optimize.ModuleConcatenationPlugin(),
+                        new webpack.optimize.CommonsChunkPlugin({
+                            name: 'vendor',
+                            minChunks: function(module,count){
+                            return (
+                                module.resource &&
+                                /\.js$/.test(module.resource) &&
+                                module.resource.indexOf(path.join(context, './node_modules')) === 0
+                            )
+                            }
+                        }),
+                        new webpack.optimize.CommonsChunkPlugin({
+                            name: 'v~',
+                            minChunks: function(module,count){
+                                return (
+                                    module.resource &&
+                                    /vue\.js|vuex|vue-/.test(module.resource) &&
+                                    module.resource.indexOf(path.join(context, './node_modules')) === 0
+                                )
+                            }
+                        }),
+                        // extract webpack runtime and module manifest to its own file in order to
+                        // prevent vendor hash from being updated whenever app bundle is updated
+                        new webpack.optimize.CommonsChunkPlugin({
+                            name: 'manifest',
+                            minChunks: Infinity
+                        }),
+                        // This instance extracts shared chunks from code splitted chunks and bundles them
+                        // in a separate chunk, similar to the vendor chunk
+                        // see: https://webpack.js.org/plugins/commons-chunk-plugin/#extra-async-commons-chunk
+                        new webpack.optimize.CommonsChunkPlugin({
+                            name: 'app',
+                            async: 'children-async',
+                            children: true,
+                            minChunks: 2
+                        }) 
                     ] 
-                    : [new webpack.HotModuleReplacementPlugin()]
-            ),
-            new webpack.optimize.ModuleConcatenationPlugin(),
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'vendor',
-                minChunks: function(module,count){
-                return (
-                    module.resource &&
-                    /\.js$/.test(module.resource) &&
-                    module.resource.indexOf(path.join(context, './node_modules')) === 0
-                )
-                }
-            }),
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'v~',
-                minChunks: function(module,count){
-                    return (
-                        module.resource &&
-                        /vue\.js|vuex|vue-/.test(module.resource) &&
-                        module.resource.indexOf(path.join(context, './node_modules')) === 0
-                    )
-                }
-            }),
-            // extract webpack runtime and module manifest to its own file in order to
-            // prevent vendor hash from being updated whenever app bundle is updated
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'manifest',
-                minChunks: Infinity
-            }),
-            // This instance extracts shared chunks from code splitted chunks and bundles them
-            // in a separate chunk, similar to the vendor chunk
-            // see: https://webpack.js.org/plugins/commons-chunk-plugin/#extra-async-commons-chunk
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'app',
-                async: 'children-async',
-                children: true,
-                minChunks: 2
-            }) 
+                    : [
+                        new webpack.HotModuleReplacementPlugin(),
+                        new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
+                        new webpack.NoEmitOnErrorsPlugin()
+                    ]
+            )
         ]
     };
 };

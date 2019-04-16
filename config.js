@@ -38,6 +38,7 @@ module.exports = function(context, basePath = '', nomocker = false){
 
     return {
         devServer: {
+            disableHostCheck: true,
             historyApiFallback: {
                 rewrites: [
                     { from: /.*/, to: '/index.html' },
@@ -49,7 +50,7 @@ module.exports = function(context, basePath = '', nomocker = false){
             overlay: true,
             publicPath: '/',
             ...p,
-            quiet: true,
+            quiet: false,
             watchOptions: { 
                 poll: true
             }

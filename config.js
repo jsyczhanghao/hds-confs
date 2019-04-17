@@ -50,10 +50,7 @@ module.exports = function(context, basePath = '', nomocker = false){
             overlay: true,
             publicPath: '/',
             ...p,
-            quiet: false,
-            watchOptions: { 
-                poll: true
-            }
+            quiet: false
         },
 
         devtool: isProduction ? '#source-map' : 'cheap-module-eval-source-map',

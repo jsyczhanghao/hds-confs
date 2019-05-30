@@ -81,7 +81,7 @@ module.exports = function(context, basePath = '', nomocker = false){
         },
         resolveLoader: {
             modules: [ 
-                'node_modules', path.resolve(__dirname, 'node_modules') 
+                'node_modules'//, path.resolve(__dirname, 'node_modules') 
             ]
         },
         module: {
@@ -180,11 +180,11 @@ module.exports = function(context, basePath = '', nomocker = false){
                         new webpack.optimize.CommonsChunkPlugin({
                             name: 'vendor',
                             minChunks: function(module,count){
-                            return (
-                                module.resource &&
-                                /\.js$/.test(module.resource) &&
-                                module.resource.indexOf(path.join(context, './node_modules')) === 0
-                            )
+                                return (
+                                    module.resource &&
+                                    /\.js$/.test(module.resource) &&
+                                    module.resource.indexOf(path.join(context, './node_modules')) === 0
+                                );
                             }
                         }),
                         new webpack.optimize.CommonsChunkPlugin({
@@ -207,7 +207,6 @@ module.exports = function(context, basePath = '', nomocker = false){
                         // in a separate chunk, similar to the vendor chunk
                         // see: https://webpack.js.org/plugins/commons-chunk-plugin/#extra-async-commons-chunk
                         new webpack.optimize.CommonsChunkPlugin({
-                            name: 'app',
                             async: 'children-async',
                             children: true,
                             minChunks: 2

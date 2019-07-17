@@ -125,7 +125,7 @@ module.exports = function(context, basePath = '', nomocker = false){
                     include: [resolve('src'), resolve('node_modules/webpack-dev-server/client')]
                 },
                 {
-                    test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+                    test: /\.(png|jpe?g|gif|svg|ico)(\?.*)?$/,
                     loader: 'url-loader',
                     options: {
                         limit: 100,

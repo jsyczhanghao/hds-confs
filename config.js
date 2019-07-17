@@ -152,8 +152,6 @@ module.exports = function(context, basePath = '', nomocker = false){
         },
 
         plugins: [
-            // Ignore all locale files of moment.js
-            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),
             ...(
                 isProduction ? 
                     [

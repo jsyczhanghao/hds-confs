@@ -19,6 +19,10 @@ module.exports = (function(){
     var nomocker = commonConfigs.nomocker || extraConfigs.nomocker;
     delete commonConfigs.nomocker;
     delete extraConfigs.nomocker;
+    
+    var htmlPluginOptions = commonConfigs.htmlPluginOptions || extraConfigs.htmlPluginOptions;
+    delete commonConfigs.htmlPluginOptions;
+    delete extraConfigs.htmlPluginOptions;
 
     var userDefineConfigs = merge(commonConfigs, extraConfigs);
     var publicPath = '/static', basePath = 'static';
@@ -58,11 +62,13 @@ module.exports = (function(){
             entry = path.relative(CWD, js).replace('\\', '/');
             entrys[entry] = [js + '.js'];
 
-            configs.plugins.push(new HtmlWebpackPlugin({
-                template: file,
-                filename: subpath,
-                chunks: entry ? ['manifest', 'v~', 'vendor', 'app', entry] : []
-            }))
+            configs.plugins.push(new HtmlWebpackPlugin(
+                Object.assign({
+                    template: file,
+                    filename: subpath,
+                    chunks: entry ? ['manifest', 'v~', 'vendor', 'app', entry] : []
+                }, htmlPluginOptions || {})
+            ));
         }
     });
 

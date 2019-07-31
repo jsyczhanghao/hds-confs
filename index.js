@@ -13,7 +13,9 @@ module.exports = (function(){
 
     try{
         extraConfigs = require(process.extra_config);
-    }catch(e){};
+    }catch(e){
+        throw new Error(e);
+    };
 
     var commonConfigs = require(path.join(CWD, 'conf/conf.js'));
     var nomocker = commonConfigs.nomocker || extraConfigs.nomocker;

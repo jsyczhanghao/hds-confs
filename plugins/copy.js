@@ -23,7 +23,7 @@ Copy.prototype.apply = function(compiler){
 
             if (include || exclude) {
                 opts.filter = function (from) {
-                    from = path.relative(compiler.context, from).replace(/\\+/g, '');
+                    from = path.relative(compiler.context, from).replace(/\\+/g, '/');
 
                     if (include) {
                         return from.indexOf(include) > -1 || include.indexOf(from) > -1;

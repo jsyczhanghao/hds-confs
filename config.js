@@ -86,16 +86,6 @@ module.exports = function(context, basePath = '', nomocker = false){
         },
         module: {
             rules: [
-                {
-                    test: /\.(js|vue)$/,
-                    loader: 'eslint-loader',
-                    enforce: 'pre',
-                    include: [resolve('src')],
-                    options: {
-                        formatter: require('eslint-friendly-formatter'),
-                        emitWarning: true
-                    }
-                },
                 ...utils.styleLoaders({
                     sourceMap: true,
                     extract: isProduction,

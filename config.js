@@ -154,7 +154,17 @@ module.exports = function(context, basePath = '', nomocker = false){
                             filename: basePath + 'css/[name].[contenthash].css',
                             allChunks: true
                         }),
-                        new UglifyJsPlugin(),
+                        new UglifyJsPlugin({
+                            uglifyOptions: {
+                              compress: {
+                                warnings: false
+                              },
+                              mangle: {
+                                safari10: true
+                              }
+                            },
+                            parallel: true
+                        }),
                         new OptimizeCSSPlugin({
                             cssProcessorOptions: { 
                                 safe: true, 
